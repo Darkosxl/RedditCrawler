@@ -1,4 +1,5 @@
 import asyncio
+import json
 import math
 import os
 
@@ -33,14 +34,12 @@ async def subredditcrawl(subreddit_url, num_posts):
             "name": "Reddit Posts",
             "baseSelector": "shreddit-post",
             "baseFields": [
+                {"name": "title", "type": "attribute", "attribute": "post-title"},
                 {"name": "author", "type": "attribute", "attribute": "author"},
                 {"name": "score", "type": "attribute", "attribute": "score"},
                 {"name": "comment_count", "type": "attribute", "attribute": "comment-count"},
                 {"name": "permalink", "type": "attribute", "attribute": "permalink"},
                 {"name": "content_href", "type": "attribute", "attribute": "content-href"},
-            ],
-            "fields": [
-                {"name": "title", "selector": "div[slot='title']", "type": "text"},
             ]
     }
         
@@ -49,6 +48,7 @@ async def subredditcrawl(subreddit_url, num_posts):
         wait_after_scroll=2.0,
         scroll_by="page_height",
         container_selector="shreddit-feed",
+        deduplicate=True,
     )
 
     browser_conf = BrowserConfig(
@@ -65,12 +65,13 @@ async def subredditcrawl(subreddit_url, num_posts):
         result = await redditcrawler.arun(url=subreddit_url, config=run_config)
         if not result.success:
             return {"error": f"Failed to scrape {subreddit_url}", "status": 500}
-        
-        posts = result.extracted_content
-        
+
+        # Parse JSON string to list
+        posts = json.loads(result.extracted_content) if result.extracted_content else []
+
         return {
                 "status": "success",
                 "source_url": subreddit_url,
-                "post_count": len(posts) if posts else 0,
+                "post_count": len(posts),
                 "posts": posts,
         }
