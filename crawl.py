@@ -75,3 +75,54 @@ async def subredditcrawl(subreddit_url, num_posts):
                 "post_count": len(posts),
                 "posts": posts,
         }
+
+async def postcrawl(post_link, comment_limit=10):
+    # Add sort=top to get top comments
+    if "?" in post_link:
+        post_link += "&sort=top"
+    else:
+        post_link += "?sort=top"
+
+    schema = {
+            "name": "Reddit Comments",
+            "baseSelector": "shreddit-comment[depth='0']", 
+            "baseFields": [
+                {"name": "author", "type": "attribute", "attribute": "author"},
+                {"name": "upvotes", "type": "attribute", "attribute": "score"},
+            ],
+            "fields": [
+                {"name": "body", "selector": "div[slot='comment']", "type": "text"},
+            ]
+    }
+
+    reddit_scroll_config = VirtualScrollConfig(
+        scroll_count=math.ceil(comment_limit / 5),
+        wait_after_scroll=2.0,
+        scroll_by="page_height",
+        container_selector="shreddit-comment-tree",
+    )
+
+    browser_conf = BrowserConfig(
+        headless=True,
+        verbose=True,
+        proxy_config=os.getenv("PROXY_API_KEY"),
+        text_mode=True,  # Tells crawl4ai to skip loading images/media
+    )
+    
+    strategy = JsonCssExtractionStrategy(schema, verbose=True)
+    
+    async with AsyncWebCrawler(config=browser_conf) as redditcrawler:
+        run_config = CrawlerRunConfig(virtual_scroll_config=reddit_scroll_config, extraction_strategy=strategy)
+        result = await redditcrawler.arun(url=post_link, config=run_config)
+        if not result.success:
+            return {"error": f"Failed to scrape {post_link}", "status": 500}
+
+        # Parse JSON string to list
+        comments = json.loads(result.extracted_content) if result.extracted_content else []
+
+        return {
+                "status": "success",
+                "source_url": post_link,
+                "comment_count": len(comments),
+                "comments": comments,
+        }
