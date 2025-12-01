@@ -83,6 +83,32 @@ async def postcrawl(post_link, comment_limit=10):
     else:
         post_link += "?sort=top"
 
+    # JavaScript to flatten shadow DOM - makes shadow content accessible to normal selectors
+    flatten_shadow_dom_js = """
+    (function flattenShadowDOM() {
+        function getShadowDomHtml(shadowRoot) {
+            let shadowHTML = '';
+            for (const el of shadowRoot.childNodes) {
+                shadowHTML += el.nodeValue || el.outerHTML || '';
+            }
+            return shadowHTML;
+        }
+
+        function replaceShadowDomsRecursively(rootElement) {
+            const elements = rootElement.querySelectorAll('*');
+            for (const el of elements) {
+                if (el.shadowRoot) {
+                    replaceShadowDomsRecursively(el.shadowRoot);
+                    el.innerHTML += getShadowDomHtml(el.shadowRoot);
+                }
+            }
+        }
+
+        replaceShadowDomsRecursively(document.body);
+        console.log('Shadow DOM flattened successfully');
+    })();
+    """
+
     schema = {
             "name": "Reddit Comments",
             "baseSelector": "shreddit-comment[depth='0']", 
@@ -112,7 +138,12 @@ async def postcrawl(post_link, comment_limit=10):
     strategy = JsonCssExtractionStrategy(schema, verbose=True)
     
     async with AsyncWebCrawler(config=browser_conf) as redditcrawler:
-        run_config = CrawlerRunConfig(virtual_scroll_config=reddit_scroll_config, extraction_strategy=strategy)
+        run_config = CrawlerRunConfig(
+            virtual_scroll_config=reddit_scroll_config,
+            extraction_strategy=strategy,
+            js_code=flatten_shadow_dom_js,
+            wait_for="css:shreddit-comment-tree"
+        )
         result = await redditcrawler.arun(url=post_link, config=run_config)
         if not result.success:
             return {"error": f"Failed to scrape {post_link}", "status": 500}
