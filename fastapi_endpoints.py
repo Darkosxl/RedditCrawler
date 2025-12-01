@@ -6,5 +6,5 @@ app = FastAPI()
 
 
 @app.get("/crawlsubreddit")
-async def root(subreddit: str, query: str, num_posts: int=3):
-    return subredditcrawl(subreddit, num_posts, query)
+async def root(subreddit: str, num_posts: int=3):
+    return subredditcrawl(subreddit, num_posts)
