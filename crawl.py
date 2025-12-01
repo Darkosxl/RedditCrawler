@@ -43,7 +43,7 @@ async def subredditcrawl(subreddit_url, num_posts):
     }
         
     reddit_scroll_config = VirtualScrollConfig(
-        scroll_count=math.ceil(num_posts / 4),
+        scroll_count=math.ceil(num_posts / 2),
         wait_after_scroll=2.0,
         scroll_by="page_height",
         container_selector="shreddit-feed",
@@ -63,9 +63,12 @@ async def subredditcrawl(subreddit_url, num_posts):
         result = await redditcrawler.arun(url=subreddit_url, config=run_config)
         if not result.success:
             return {"error": f"Failed to scrape {subreddit_url}", "status": 500}
+        
+        posts = result.extracted_content
+        
         return {
-            "status": "success",
-            "source_url": subreddit_url,
-            "character_count": len(result.markdown),
-            "content": result.markdown,  # <--- THIS is what your LLM needs
+                "status": "success",
+                "source_url": subreddit_url,
+                "post_count": len(posts) if posts else 0,
+                "posts": posts,
         }
