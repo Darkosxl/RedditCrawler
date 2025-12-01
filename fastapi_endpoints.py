@@ -10,7 +10,7 @@ app = FastAPI()
 ENDPOINT_PASSWORD = os.getenv("ENDPOINT_PASSWORD")
 
 @app.get("/health")
-async def health():
+def health():
     return {"status": "ok"}
 
 @app.get("/crawlsubreddit")
