@@ -40,7 +40,8 @@ async def subredditcrawl(subreddit_url, num_posts):
                 {"name": "comment_count", "type": "attribute", "attribute": "comment-count"},
                 {"name": "permalink", "type": "attribute", "attribute": "permalink"},
                 {"name": "content_href", "type": "attribute", "attribute": "content-href"},
-            ]
+            ],
+            "fields": []
     }
         
     reddit_scroll_config = VirtualScrollConfig(
