@@ -48,7 +48,6 @@ async def subredditcrawl(subreddit_url, num_posts):
         wait_after_scroll=2.0,
         scroll_by="page_height",
         container_selector="shreddit-feed",
-        deduplicate=True,
     )
 
     browser_conf = BrowserConfig(
