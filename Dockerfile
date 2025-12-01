@@ -1,10 +1,10 @@
-# 1. Use the official image to get the system dependencies (Linux drivers)
-# We use this primarily for the OS-level libraries (libnss3, libgtk, etc)
+# 1. Use the official image (runs as 'appuser' by default)
 FROM unclecode/crawl4ai:latest
 
-# 2. Set environment variables to force Playwright to behave
-# This ensures browsers are installed globally in the container, not just for one user
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# 2. THE FIX: Set the browser path to a folder the USER OWNS
+# We point this to the user's internal home directory.
+# No root access required. No VPS commands required.
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/appuser/pw-browsers
 
 # 3. Set working directory
 WORKDIR /app
@@ -12,20 +12,19 @@ WORKDIR /app
 # 4. Copy requirements
 COPY requirements.txt .
 
-# 5. Install your Python libraries
-# This step often upgrades Playwright, breaking the pre-installed browser link
+# 5. Install Python libs
+# This triggers the Playwright upgrade
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 6. THE FIX: Force re-installation of the browser
-# We use the 'root' user to install them globally so ANY user can find them.
-# The 'chromium' arg keeps the image size smaller (skips Firefox/WebKit).
+# 6. Install Chromium
+# This now succeeds because we are writing to our own home folder
 RUN playwright install chromium
 
-# 7. Copy your application code
+# 7. Copy your code
 COPY . .
 
-# 8. Expose your port
+# 8. Expose port
 EXPOSE 9090
 
-# 9. Run the application
+# 9. Run the app
 CMD ["uvicorn", "fastapi_endpoints:app", "--host", "0.0.0.0", "--port", "9090"]
