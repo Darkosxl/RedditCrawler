@@ -6,15 +6,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install browsers to /app/.browsers - accessible regardless of runtime user
-ENV PLAYWRIGHT_BROWSERS_PATH=/app/.browsers
-RUN mkdir -p /app/.browsers && \
-    playwright install chromium && \
-    chmod -R 755 /app/.browsers
+# Install to BOTH locations to cover all cases
+RUN playwright install chromium && \
+    mkdir -p /home/appuser/.cache/ms-playwright && \
+    cp -r /root/.cache/ms-playwright/* /home/appuser/.cache/ms-playwright/ && \
+    chmod -R 755 /root/.cache/ms-playwright && \
+    chmod -R 755 /home/appuser/.cache/ms-playwright
 
 COPY . .
-
-# Make everything readable by any user
 RUN chmod -R 755 /app
 
 EXPOSE 9090
