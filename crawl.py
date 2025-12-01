@@ -13,6 +13,7 @@ from crawl4ai import (
     CrawlerRunConfig,
     LLMConfig,
     VirtualScrollConfig,
+    JsonCssExtractionStrategy
 )
 from scrapeops_python_requests.scrapeops_requests import ScrapeOpsRequests
 
@@ -27,6 +28,20 @@ dotenv.load_dotenv()
 
 
 async def subredditcrawl(subreddit_url, num_posts):
+    
+    schema = {
+            "name": "Reddit Posts",
+            "baseSelector": "shreddit-post",
+            "fields": [
+                {"name": "title", "selector": "div[slot='title']", "type": "text"},
+                {"name": "author", "selector": "", "type": "attribute", "attribute": "author"},
+                {"name": "score", "selector": "", "type": "attribute", "attribute": "score"},
+                {"name": "comment_count", "selector": "", "type": "attribute", "attribute": "comment-count"},
+                {"name": "permalink", "selector": "", "type": "attribute", "attribute": "permalink"},
+                {"name": "content_href", "selector": "", "type": "attribute", "attribute": "content-href"},
+        ]
+    }
+        
     reddit_scroll_config = VirtualScrollConfig(
         scroll_count=math.ceil(num_posts / 4),
         wait_after_scroll=2.0,
@@ -40,10 +55,11 @@ async def subredditcrawl(subreddit_url, num_posts):
         proxy_config=os.getenv("PROXY_API_KEY"),
         text_mode=True,  # Tells crawl4ai to skip loading images/media
     )
-
+    
+    strategy = JsonCssExtractionStrategy(schema, verbose=True)
+    
     async with AsyncWebCrawler(config=browser_conf) as redditcrawler:
-        run_config = CrawlerRunConfig(virtual_scroll_config=reddit_scroll_config)
-
+        run_config = CrawlerRunConfig(virtual_scroll_config=reddit_scroll_config, extraction_strategy=strategy)
         result = await redditcrawler.arun(url=subreddit_url, config=run_config)
         if not result.success:
             return {"error": f"Failed to scrape {subreddit_url}", "status": 500}
