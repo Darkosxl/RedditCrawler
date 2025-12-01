@@ -32,14 +32,16 @@ async def subredditcrawl(subreddit_url, num_posts):
     schema = {
             "name": "Reddit Posts",
             "baseSelector": "shreddit-post",
+            "baseFields": [
+                {"name": "author", "type": "attribute", "attribute": "author"},
+                {"name": "score", "type": "attribute", "attribute": "score"},
+                {"name": "comment_count", "type": "attribute", "attribute": "comment-count"},
+                {"name": "permalink", "type": "attribute", "attribute": "permalink"},
+                {"name": "content_href", "type": "attribute", "attribute": "content-href"},
+            ],
             "fields": [
                 {"name": "title", "selector": "div[slot='title']", "type": "text"},
-                {"name": "author", "selector": "", "type": "attribute", "attribute": "author"},
-                {"name": "score", "selector": "", "type": "attribute", "attribute": "score"},
-                {"name": "comment_count", "selector": "", "type": "attribute", "attribute": "comment-count"},
-                {"name": "permalink", "selector": "", "type": "attribute", "attribute": "permalink"},
-                {"name": "content_href", "selector": "", "type": "attribute", "attribute": "content-href"},
-        ]
+            ]
     }
         
     reddit_scroll_config = VirtualScrollConfig(
