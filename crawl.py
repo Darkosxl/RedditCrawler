@@ -56,7 +56,7 @@ async def subredditcrawl(subreddit_url, num_posts):
         headless=True,
         verbose=True,
         proxy_config=os.getenv("PROXY_API_KEY"),
-        text_mode=True,  # Tells crawl4ai to skip loading images/media
+        text_mode=True, 
     )
     
     strategy = JsonCssExtractionStrategy(schema, verbose=True)
@@ -71,7 +71,7 @@ async def subredditcrawl(subreddit_url, num_posts):
         if not result.success:
             return {"error": f"Failed to scrape {subreddit_url}", "status": 500}
 
-        # Parse JSON string to list
+
         posts = json.loads(result.extracted_content) if result.extracted_content else []
 
         return {
@@ -82,7 +82,6 @@ async def subredditcrawl(subreddit_url, num_posts):
         }
 
 async def postcrawl(post_link, comment_limit=10):
-    # Add sort=top to get top comments
     if "?" in post_link:
         post_link += "&sort=top"
     else:
@@ -147,7 +146,7 @@ async def postcrawl(post_link, comment_limit=10):
         headless=True,
         verbose=True,
         proxy_config=os.getenv("PROXY_API_KEY"),
-        text_mode=True,  # Tells crawl4ai to skip loading images/media
+        text_mode=True,  
     )
     
     strategy = JsonCssExtractionStrategy(schema, verbose=True)
@@ -157,19 +156,38 @@ async def postcrawl(post_link, comment_limit=10):
             virtual_scroll_config=reddit_scroll_config,
             extraction_strategy=strategy,
             js_code=flatten_shadow_dom_js,
-            wait_for="css:shreddit-post",
+
+            page_timeout=30000,  
             excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
         )
-        result = await redditcrawler.arun(url=post_link, config=run_config)
-        if not result.success:
-            return {"error": f"Failed to scrape {post_link}", "status": 500}
 
-        # Parse JSON string to list
-        comments = json.loads(result.extracted_content) if result.extracted_content else []
+        try:
+            result = await redditcrawler.arun(url=post_link, config=run_config)
 
-        return {
+
+            if not result.success or not result.extracted_content:
+                return {
+                    "status": "success",
+                    "source_url": post_link,
+                    "comment_count": 0,
+                    "comments": [],
+                    "note": "Post may not exist or failed to load"
+                }
+
+         
+            comments = json.loads(result.extracted_content) if result.extracted_content else []
+
+            return {
                 "status": "success",
                 "source_url": post_link,
                 "comment_count": len(comments),
                 "comments": comments,
-        }
+            }
+        except Exception as e:
+            return {
+                "status": "success",
+                "source_url": post_link,
+                "comment_count": 0,
+                "comments": [],
+                "note": f"Failed to load post: {str(e)}"
+            }
