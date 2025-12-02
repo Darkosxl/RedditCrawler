@@ -89,7 +89,17 @@ async def postcrawl(post_link, comment_limit=10):
         post_link += "?sort=top"
 
     flatten_shadow_dom_js = """
-    (function flattenShadowDOM() {
+    (async function() {
+        // First, scroll down to trigger lazy-loading of comments
+        console.log('Scrolling to trigger comment loading...');
+        window.scrollTo(0, document.body.scrollHeight);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Scroll back up a bit to ensure comment tree is in viewport
+        window.scrollTo(0, document.body.scrollHeight / 2);
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Now flatten Shadow DOM
         function getShadowDomHtml(shadowRoot) {
             let shadowHTML = '';
             for (const el of shadowRoot.childNodes) {
@@ -147,7 +157,7 @@ async def postcrawl(post_link, comment_limit=10):
             virtual_scroll_config=reddit_scroll_config,
             extraction_strategy=strategy,
             js_code=flatten_shadow_dom_js,
-            wait_for="css:shreddit-comment-tree",
+            wait_for="css:shreddit-post",
             excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
         )
         result = await redditcrawler.arun(url=post_link, config=run_config)
