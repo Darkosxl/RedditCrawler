@@ -165,6 +165,7 @@ async def postcrawl(post_link, comment_limit=10):
             js_code=flatten_shadow_dom_js,
             wait_for=f"js:{wait_condition}",
             wait_for_timeout=20000,  # 20s timeout
+            delay_before_return_html=3.0,  # Wait 3s after JS completes for DOM to settle
             page_timeout=30000,
             excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
         )
