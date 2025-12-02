@@ -150,14 +150,22 @@ async def postcrawl(post_link, comment_limit=10):
     )
     
     strategy = JsonCssExtractionStrategy(schema, verbose=True)
-    
+
+    # Wait for ANY Reddit element to load - whichever appears first
+    wait_condition = """() => {
+        return document.querySelector('shreddit-post') ||
+               document.querySelector('shreddit-comment-tree') ||
+               document.querySelector('shreddit-comment');
+    }"""
+
     async with AsyncWebCrawler(config=browser_conf) as redditcrawler:
         run_config = CrawlerRunConfig(
             virtual_scroll_config=reddit_scroll_config,
             extraction_strategy=strategy,
             js_code=flatten_shadow_dom_js,
-
-            page_timeout=30000,  
+            wait_for=f"js:{wait_condition}",
+            wait_for_timeout=20000,  # 20s timeout
+            page_timeout=30000,
             excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
         )
 
