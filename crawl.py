@@ -62,7 +62,11 @@ async def subredditcrawl(subreddit_url, num_posts):
     strategy = JsonCssExtractionStrategy(schema, verbose=True)
     
     async with AsyncWebCrawler(config=browser_conf) as redditcrawler:
-        run_config = CrawlerRunConfig(virtual_scroll_config=reddit_scroll_config, extraction_strategy=strategy)
+        run_config = CrawlerRunConfig(
+            virtual_scroll_config=reddit_scroll_config,
+            extraction_strategy=strategy,
+            excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
+        )
         result = await redditcrawler.arun(url=subreddit_url, config=run_config)
         if not result.success:
             return {"error": f"Failed to scrape {subreddit_url}", "status": 500}
@@ -84,7 +88,6 @@ async def postcrawl(post_link, comment_limit=10):
     else:
         post_link += "?sort=top"
 
-    # JavaScript to flatten shadow DOM - makes shadow content accessible to normal selectors
     flatten_shadow_dom_js = """
     (function flattenShadowDOM() {
         function getShadowDomHtml(shadowRoot) {
@@ -144,7 +147,8 @@ async def postcrawl(post_link, comment_limit=10):
             virtual_scroll_config=reddit_scroll_config,
             extraction_strategy=strategy,
             js_code=flatten_shadow_dom_js,
-            wait_for="css:shreddit-comment-tree"
+            wait_for="css:shreddit-comment-tree",
+            excluded_tags=["img", "video", "source", "picture", "iframe", "svg"]
         )
         result = await redditcrawler.arun(url=post_link, config=run_config)
         if not result.success:
