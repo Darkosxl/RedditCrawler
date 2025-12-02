@@ -40,6 +40,7 @@ async def subredditcrawl(subreddit_url, num_posts):
                 {"name": "comment_count", "type": "attribute", "attribute": "comment-count"},
                 {"name": "permalink", "type": "attribute", "attribute": "permalink"},
                 {"name": "content_href", "type": "attribute", "attribute": "content-href"},
+                {"name": "created_timestamp", "type": "attribute", "attribute": "created-timestamp"},
             ],
             "fields": []
     }
@@ -111,10 +112,11 @@ async def postcrawl(post_link, comment_limit=10):
 
     schema = {
             "name": "Reddit Comments",
-            "baseSelector": "shreddit-comment[depth='0']", 
+            "baseSelector": "shreddit-comment[depth='0']",
             "baseFields": [
                 {"name": "author", "type": "attribute", "attribute": "author"},
                 {"name": "upvotes", "type": "attribute", "attribute": "score"},
+                {"name": "created_timestamp", "type": "attribute", "attribute": "created-timestamp"},
             ],
             "fields": [
                 {"name": "body", "selector": "div[slot='comment']", "type": "text"},
