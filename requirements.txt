@@ -1,3 +1,4 @@
+apify>=2.0.0
 Crawl4AI==0.7.7
 fastapi==0.122.0
 uvicorn==0.38.0

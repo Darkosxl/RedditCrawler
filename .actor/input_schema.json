@@ -1,0 +1,58 @@
+{
+    "title": "Reddit Crawler Input",
+    "description": "Configure the Reddit crawler to scrape subreddits or individual posts",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "Crawl Mode",
+            "type": "string",
+            "description": "Choose whether to crawl a subreddit for posts or a specific post for comments",
+            "enum": [
+                "subreddit",
+                "post"
+            ],
+            "default": "subreddit",
+            "editor": "select"
+        },
+        "subreddit": {
+            "title": "Subreddit",
+            "type": "string",
+            "description": "Name of the subreddit to crawl (e.g., programming, wallstreetbets)",
+            "default": "programming",
+            "editor": "textfield",
+            "example": "programming"
+        },
+        "num_posts": {
+            "title": "Number of Posts",
+            "type": "integer",
+            "description": "Maximum number of posts to extract from the subreddit",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100,
+            "editor": "number"
+        },
+        "post_url": {
+            "title": "Post URL",
+            "type": "string",
+            "description": "Full URL of the Reddit post to crawl for comments",
+            "editor": "textfield",
+            "example": "https://www.reddit.com/r/programming/comments/abc123/example_post/"
+        },
+        "comment_limit": {
+            "title": "Comment Limit",
+            "type": "integer",
+            "description": "Maximum number of top-level comments to extract",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100,
+            "editor": "number"
+        },
+        "proxy_config": {
+            "title": "Proxy Configuration",
+            "type": "string",
+            "description": "Optional proxy configuration string for the crawler",
+            "editor": "textfield"
+        }
+    }
+}

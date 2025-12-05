@@ -1,0 +1,52 @@
+{
+    "actorSpecification": 1,
+    "name": "reddit-crawler",
+    "title": "Reddit Crawler",
+    "description": "Crawl Reddit subreddits and posts to extract posts and comments data",
+    "version": "1.0",
+    "dockerfile": "./Dockerfile",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": {
+            "actorSpecification": 1,
+            "fields": {
+                "title": {
+                    "type": "string",
+                    "title": "Post Title"
+                },
+                "author": {
+                    "type": "string",
+                    "title": "Author"
+                },
+                "score": {
+                    "type": "string",
+                    "title": "Score"
+                },
+                "comment_count": {
+                    "type": "string",
+                    "title": "Comment Count"
+                },
+                "permalink": {
+                    "type": "string",
+                    "title": "Permalink"
+                },
+                "content_href": {
+                    "type": "string",
+                    "title": "Content URL"
+                },
+                "created_timestamp": {
+                    "type": "string",
+                    "title": "Created At"
+                },
+                "upvotes": {
+                    "type": "string",
+                    "title": "Upvotes"
+                },
+                "body": {
+                    "type": "string",
+                    "title": "Comment Body"
+                }
+            }
+        }
+    }
+}
