@@ -5,6 +5,7 @@
     "description": "Crawl Reddit subreddits and posts to extract posts and comments data",
     "version": "1.0",
     "dockerfile": "./Dockerfile",
+    "readme": "./README.md",
     "input": "./input_schema.json",
     "output": "./output_schema.json",
     "storages": {

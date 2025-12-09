@@ -1,0 +1,80 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "posts": {
+            "title": "Reddit Posts",
+            "transformation": {
+                "fields": [
+                    "title",
+                    "author",
+                    "score",
+                    "comment_count",
+                    "permalink",
+                    "created_timestamp"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "title": {
+                        "label": "Title",
+                        "format": "text"
+                    },
+                    "author": {
+                        "label": "Author",
+                        "format": "text"
+                    },
+                    "score": {
+                        "label": "Score",
+                        "format": "text"
+                    },
+                    "comment_count": {
+                        "label": "Comments",
+                        "format": "text"
+                    },
+                    "permalink": {
+                        "label": "Link",
+                        "format": "link"
+                    },
+                    "created_timestamp": {
+                        "label": "Created",
+                        "format": "text"
+                    }
+                }
+            }
+        },
+        "comments": {
+            "title": "Reddit Comments",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "upvotes",
+                    "body",
+                    "created_timestamp"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": {
+                        "label": "Author",
+                        "format": "text"
+                    },
+                    "upvotes": {
+                        "label": "Upvotes",
+                        "format": "text"
+                    },
+                    "body": {
+                        "label": "Comment",
+                        "format": "text"
+                    },
+                    "created_timestamp": {
+                        "label": "Created",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Reddit Crawler Output",
+    "properties": {
+        "posts": {
+            "type": "string",
+            "title": "Posts View",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=posts"
+        },
+        "comments": {
+            "type": "string",
+            "title": "Comments View",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=comments"
+        }
+    }
+}
