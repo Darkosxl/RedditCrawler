@@ -19,9 +19,9 @@ from crawl4ai import (
 from scrapeops_python_requests.scrapeops_requests import ScrapeOpsRequests
 
 scrapeops_logger = ScrapeOpsRequests(
-    scrapeops_api_key="c05e7246-4ab0-4d43-9457-c80e85631786",
-    spider_name="Scraping Amazon",
-    job_name="Clothing Section",
+    scrapeops_api_key=os.getenv("SCRAPEOPS_API_KEY"),
+    spider_name="Scraping Reddit",
+    job_name="Reddit Crawler",
 )
 
 request = scrapeops_logger.RequestsWrapper()
